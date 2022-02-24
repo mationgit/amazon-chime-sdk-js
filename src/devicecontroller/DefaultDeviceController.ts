@@ -123,6 +123,7 @@ export default class DefaultDeviceController
   private static defaultSampleSize = 16;
   private static defaultChannelCount = 1;
   private static audioContext: AudioContext | null = null;
+  private static audioBufferSourceNode: AudioBufferSourceNode | undefined;
 
   private deviceInfoCache: MediaDeviceInfo[] | null = null;
 
@@ -268,7 +269,18 @@ export default class DefaultDeviceController
     await this.chooseAudioInputDevice(null);
     await this.chooseVideoInputDevice(null);
 
+    // Clean up the active audio device created when `chooseAudioInputDevice(null)' is called.
+    // The active video device has already been cleaned up when `chooseVideoInputDevice(null)` is called above.
+    let active = this.activeDevices['audio'];
+    this.releaseActiveDevice(active);
+    active = undefined;
+    delete this.activeDevices['audio'];
+
     // Tear down any Web Audio infrastructure we have hanging around.
+    DefaultDeviceController.audioBufferSourceNode.stop();
+    DefaultDeviceController.audioBufferSourceNode.disconnect();
+    DefaultDeviceController.audioBufferSourceNode.buffer = undefined;
+    DefaultDeviceController.audioBufferSourceNode = undefined;
     this.audioInputSourceNode?.disconnect();
     this.audioInputDestinationNode?.disconnect();
     this.audioInputSourceNode = undefined;
@@ -1034,20 +1046,20 @@ export default class DefaultDeviceController
     const audioContext = DefaultDeviceController.getAudioContext();
     const outputNode = audioContext.createMediaStreamDestination();
     if (!toneHz) {
-      const source = audioContext.createBufferSource();
+      this.audioBufferSourceNode = audioContext.createBufferSource();
 
       // The AudioContext object uses the sample rate of the default output device
       // if not specified. Creating an AudioBuffer object with the output device's
       // sample rate fails in some browsers, e.g. Safari with a Bluetooth headphone.
       try {
-        source.buffer = audioContext.createBuffer(
+        this.audioBufferSourceNode.buffer = audioContext.createBuffer(
           1,
           audioContext.sampleRate * 5,
           audioContext.sampleRate
         );
       } catch (error) {
         if (error && error.name === 'NotSupportedError') {
-          source.buffer = audioContext.createBuffer(
+          this.audioBufferSourceNode.buffer = audioContext.createBuffer(
             1,
             DefaultDeviceController.defaultSampleRate * 5,
             DefaultDeviceController.defaultSampleRate
@@ -1060,10 +1072,10 @@ export default class DefaultDeviceController
       // Some browsers will not play audio out the MediaStreamDestination
       // unless there is actually audio to play, so we add a small amount of
       // noise here to ensure that audio is played out.
-      source.buffer.getChannelData(0)[0] = 0.0003;
-      source.loop = true;
-      source.connect(outputNode);
-      source.start();
+      this.audioBufferSourceNode.buffer.getChannelData(0)[0] = 0.0003;
+      this.audioBufferSourceNode.loop = true;
+      this.audioBufferSourceNode.connect(outputNode);
+      this.audioBufferSourceNode.start();
     } else {
       const gainNode = audioContext.createGain();
       gainNode.gain.value = 0.1;
