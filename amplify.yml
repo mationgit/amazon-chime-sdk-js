@@ -5,8 +5,8 @@ applications:
         preBuild:
           commands:
             - nvm install 14.17.4
-            - npm install
             - nvm use $VERSION_NODE_10
+            - npm install
             - bundle install
             - yarn
             - npm rebuild node-sass
