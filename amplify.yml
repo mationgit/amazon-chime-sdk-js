@@ -8,10 +8,11 @@ applications:
             - npm install
         build:
           commands:
-            - npm run start:hot
+            - npm run build -- --env app=meetingV2
       artifacts:
-        baseDirectory: /
+        baseDirectory: dist
         files:
           - '**/*'
       cache:
-        paths: []
+        paths:
+          - node_modules/**/*
