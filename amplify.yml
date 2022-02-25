@@ -1,16 +1,17 @@
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - nvm install 14.17.4
-        - npm install
-    build:
-      commands:
-        - npm run start:hot
-  artifacts:
-    baseDirectory: dist/lamameet
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
+applications:
+  - appRoot: demos/browser
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - nvm install 14.17.4
+            - npm install
+        build:
+          commands:
+            - npm run start:hot
+      artifacts:
+        baseDirectory: /
+        files:
+          - '**/*'
+      cache:
+        paths: []
