@@ -1,15 +1,11 @@
 applications:
-  - appRoot: demos/browser
+  - appRoot: demos/browser/
     frontend:
       phases:
         preBuild:
           commands:
             - nvm install 14.17.4
-            - nvm use $VERSION_NODE_10
             - npm install
-            - bundle install
-            - yarn
-            - npm rebuild node-sass
         build:
           commands:
             - npm run start:hot
