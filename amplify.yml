@@ -6,6 +6,10 @@ applications:
           commands:
             - nvm install 14.17.4
             - npm install
+            - nvm use $VERSION_NODE_10
+            - bundle install
+            - yarn
+            - npm rebuild node-sass
         build:
           commands:
             - npm run start:hot
