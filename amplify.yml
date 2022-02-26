@@ -11,10 +11,9 @@ applications:
           commands:
             - nvm install 14.17.4
             - npm install
-            - npm run build
         build:
           commands:
-            - npm run start
+            - npm run build
       artifacts:
         files:
           - '**/*'
