@@ -1,18 +1,25 @@
+version: 1
 applications:
-  - appRoot: demos/browser/
+  - appRoot: demos/browser
+    env:
+      variables:
+        AMPLIFY_MONOREPO_APP_ROOT: demos/browser
+        AMPLIFY_DIFF_DEPLOY: false
     frontend:
       phases:
         preBuild:
           commands:
             - nvm install 14.17.4
             - npm install
+            - npm run build
         build:
           commands:
-            - npm run build -- --env app=meetingV2
+            - npm run start
       artifacts:
-        baseDirectory: dist
         files:
           - '**/*'
+        discard-paths: yes
+        baseDirectory: dist
       cache:
         paths:
           - node_modules/**/*
