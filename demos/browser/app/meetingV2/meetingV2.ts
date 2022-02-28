@@ -433,9 +433,10 @@ export class DemoMeetingApp
 
   initParameters(): void {
     const meeting = new URL(window.location.href).searchParams.get('m');
+    const attendee = new URL(window.location.href).searchParams.get('a');
     if (meeting) {
       (document.getElementById('inputMeeting') as HTMLInputElement).value = meeting;
-      (document.getElementById('inputName') as HTMLInputElement).focus();
+      (document.getElementById('inputName') as HTMLInputElement).value = attendee;
     } else {
       (document.getElementById('inputMeeting') as HTMLInputElement).focus();
     }
