@@ -63,7 +63,6 @@ function serve(host = '127.0.0.1:8080') {
   // Start an HTTP server to serve the index page and handle meeting actions
   http.createServer({}, async (request, response) => {
     log(`${request.method} ${request.url} BEGIN`);
-    console.log("testtesttesttesttest");
     try {
       // Enable HTTP compression
       compression({})(request, response, () => {});
@@ -72,14 +71,14 @@ function serve(host = '127.0.0.1:8080') {
         // Return the contents of the index page
         respond(response, 200, 'text/html', indexPage);
       } else if (process.env.DEBUG && request.method === 'POST' && requestUrl.pathname === '/join') {
+        throw new Error('debug Need parameters: title, name, region');
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
       } else if (request.method === 'POST' && requestUrl.pathname === '/join') {
-        console.log("logofConsole");
+        throw new Error('Need parameters: title, name, region');
         if (!requestUrl.query.title || !requestUrl.query.name || !requestUrl.query.region) {
           throw new Error('Need parameters: title, name, region');
         }
-        console.log("nextLog");
         let client = getClientForMeeting(meetingTable[requestUrl.query.title]);
 
         // Look up the meeting by its title. If it does not exist, create the meeting.

@@ -2171,6 +2171,7 @@ export class DemoMeetingApp
         method: 'POST',
       }
     );
+    console.log("TEST:await response json");
     const json = await response.json();
     if (json.error) {
       throw new Error(`Server error: ${json.error}`);
