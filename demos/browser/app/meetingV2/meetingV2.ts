@@ -623,7 +623,6 @@ export class DemoMeetingApp
             chimeMeetingId = await this.authenticate();
           } catch (error) {
             console.error(error);
-            console.log("Lamameet user not here");
             const httpErrorMessage =
               'UserMedia is not allowed in HTTP sites. Either use HTTPS or enable media capture on insecure sites.';
             (document.getElementById(
