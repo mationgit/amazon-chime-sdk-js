@@ -623,6 +623,7 @@ export class DemoMeetingApp
             chimeMeetingId = await this.authenticate();
           } catch (error) {
             console.error(error);
+            console.log("Lamameet user not here");
             const httpErrorMessage =
               'UserMedia is not allowed in HTTP sites. Either use HTTPS or enable media capture on insecure sites.';
             (document.getElementById(
@@ -3255,9 +3256,13 @@ export class DemoMeetingApp
   }
 
   async authenticate(): Promise<string> {
+    console.log("joininfo");
     this.joinInfo = (await this.joinMeeting()).JoinInfo;
+    console.log("conf");
     const configuration = new MeetingSessionConfiguration(this.joinInfo.Meeting, this.joinInfo.Attendee);
+    console.log("init");
     await this.initializeMeetingSession(configuration);
+    console.log("url");
     const url = new URL(window.location.href);
     url.searchParams.set('m', this.meeting);
     history.replaceState({}, `${this.meeting}`, url.toString());
