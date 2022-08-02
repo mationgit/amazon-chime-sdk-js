@@ -69,11 +69,11 @@ function serve(host = '127.0.0.1:8080') {
       const requestUrl = url.parse(request.url, true);
       if (request.method === 'GET' && requestUrl.pathname === '/') {
         // Return the contents of the index page
-        respond(response, 200, 'text/html', indexPage);
-      } else if (process.env.DEBUG && request.method === 'GET' && requestUrl.pathname === '/join') {
+        respond(response, 201, 'text/html', indexPage);
+      } else if (process.env.DEBUG && request.method === 'POST' && requestUrl.pathname === '/join') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
-      } else if (request.method === 'GET' && requestUrl.pathname === '/join') {
+      } else if (request.method === 'POST' && requestUrl.pathname === '/join') {
         
         if (!requestUrl.query.title || !requestUrl.query.name || !requestUrl.query.region) {
           throw new Error('Need parameters: title, name, region');
