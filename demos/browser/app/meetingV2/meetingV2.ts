@@ -2164,9 +2164,7 @@ export class DemoMeetingApp
   // eslint-disable-next-line
   async joinMeeting(): Promise<any> {
     const response = await fetch(
-      `${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
-        this.meeting
-      )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
+      `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/test2`,
       {
         method: 'GET',
       }

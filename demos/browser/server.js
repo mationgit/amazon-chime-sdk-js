@@ -69,7 +69,7 @@ function serve(host = '127.0.0.1:8080') {
       const requestUrl = url.parse(request.url, true);
       if (request.method === 'GET' && requestUrl.pathname === '/') {
         // Return the contents of the index page
-        respond(response, 201, 'text/html', indexPage);
+        respond(response, 200, 'text/html', indexPage);
       } else if (process.env.DEBUG && request.method === 'POST' && requestUrl.pathname === '/join') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
