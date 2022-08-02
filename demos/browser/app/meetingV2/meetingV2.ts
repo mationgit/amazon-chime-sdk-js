@@ -2168,7 +2168,7 @@ export class DemoMeetingApp
         this.meeting
       )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
       {
-        method: 'POST',
+        method: 'GET',
       }
     );
     console.log("TEST:await response json");
