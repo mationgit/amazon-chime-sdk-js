@@ -2166,12 +2166,18 @@ export class DemoMeetingApp
     const response = await fetch(
       `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/test2`,
       {
-        method: 'GET',
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          meeting: encodeURIComponent(this.meeting), 
+          name: encodeURIComponent(this.name),
+          region: encodeURIComponent(this.region),
+          echoReduction: this.echoReductionCapability
+        })
       }
     );
-    console.log("TEST:");
-    console.log(response);
     const json = await response.json();
+    console.log(json);
     if (json.error) {
       throw new Error(`Server error: ${json.error}`);
     }
