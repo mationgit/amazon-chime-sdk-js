@@ -2172,11 +2172,11 @@ export class DemoMeetingApp
     )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
       {
         method: 'POST',
-    /*    headers: {
+        headers: {
           'Content-Type': 'application/json',
-          'AWSAuth': token
+        //  'AWSAuth': token
         },
-        body: JSON.stringify({
+      /*  body: JSON.stringify({
           meeting: encodeURIComponent(this.meeting), 
           name: encodeURIComponent(this.name),
           region: encodeURIComponent(this.region),
