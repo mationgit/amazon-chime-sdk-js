@@ -2163,17 +2163,25 @@ export class DemoMeetingApp
 
   // eslint-disable-next-line
   async joinMeeting(): Promise<any> {
+    //const token = localStorage.getItem('token');
+    //console.log(token);
     const response = await fetch(
-      `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/test2`,
+    //  `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/chime/join`,
+    `${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
+      this.meeting
+    )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
       {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+    /*    headers: {
+          'Content-Type': 'application/json',
+          'AWSAuth': token
+        },
         body: JSON.stringify({
           meeting: encodeURIComponent(this.meeting), 
           name: encodeURIComponent(this.name),
           region: encodeURIComponent(this.region),
           echoReduction: this.echoReductionCapability
-        })
+        })*/
       }
     );
     const json = await response.json();

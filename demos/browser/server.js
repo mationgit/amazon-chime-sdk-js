@@ -74,12 +74,12 @@ function serve(host = '127.0.0.1:8080') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
       } else if (request.method === 'POST' && requestUrl.pathname === '/join') {
-        
+        log("test");
         if (!requestUrl.query.title || !requestUrl.query.name || !requestUrl.query.region) {
           throw new Error('Need parameters: title, name, region');
         }
         let client = getClientForMeeting(meetingTable[requestUrl.query.title]);
-
+        log("test2");
         // Look up the meeting by its title. If it does not exist, create the meeting.
         if (!meetingTable[requestUrl.query.title]) {
           let request = {
