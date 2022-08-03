@@ -73,7 +73,7 @@ function serve(host = '127.0.0.1:8080') {
       } else if (process.env.DEBUG && request.method === 'POST' && requestUrl.pathname === '/join') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
-      } else if (request.method === 'POST' && requestUrl.pathname === '/join') {
+      } else if (request.method === 'GET' && requestUrl.pathname === '/join') {
         log("test");
         if (!requestUrl.query.title || !requestUrl.query.name || !requestUrl.query.region) {
           throw new Error('Need parameters: title, name, region');
