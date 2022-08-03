@@ -74,7 +74,7 @@ function serve(host = '127.0.0.1:8080') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
       } else if (request.method === 'PUT' && requestUrl.pathname === '/join') {
-        respond(response, 200, 'application/json', JSON.stringify(request));
+        //respond(response, 200, 'application/json', JSON.stringify(request));
         log("test");
         if (!requestUrl.query.title || !requestUrl.query.name || !requestUrl.query.region) {
           throw new Error('Need parameters: title, name, region');
