@@ -2171,7 +2171,7 @@ export class DemoMeetingApp
       this.meeting
     )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
       {
-        method: 'GET',
+        method: 'PUT',
       /*  headers: {
           'Content-Type': 'application/json',
           'AWSAuth': token
