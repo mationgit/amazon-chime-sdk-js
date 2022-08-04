@@ -2166,7 +2166,7 @@ export class DemoMeetingApp
   async joinMeeting(): Promise<any> {
     //const token = localStorage.getItem('token');
     //console.log(token);
-    console.log("begin");
+    /*console.log("begin");
     const client = new AWS.Amplify();
     AWS.config.update({
       region: "eu-central-1"
@@ -2183,7 +2183,7 @@ export class DemoMeetingApp
       console.log(error);
       // error handling.
     }
-    console.log("end");
+    console.log("end");*/
 
     const response = await fetch(
     //  `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/chime/join`,
