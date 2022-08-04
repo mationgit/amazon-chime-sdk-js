@@ -91,7 +91,7 @@ import {
   loadBodyPixDependency,
   platformCanSupportBodyPixWithoutDegradation,
 } from './video/filters/SegmentationUtil';
-import * as AWS from "@aws-sdk/client-amplify";
+import * as AWS from "aws-sdk";
 
 let SHOULD_EARLY_CONNECT = (() => {
   return document.location.search.includes('earlyConnect=1');
@@ -2167,11 +2167,12 @@ export class DemoMeetingApp
     //const token = localStorage.getItem('token');
     //console.log(token);
     console.log("begin");
-    const client = new AWS.Amplify({ region: "eu-central-1" });
+    const client = new AWS.Chime({ region: "eu-central-1" });
 
     // async/await.
+    console.log(client);
     try {
-      const data = await client.listApps;
+      const data = await client.listMeetings();
       console.log(data);
       // process data.
     } catch (error) {
