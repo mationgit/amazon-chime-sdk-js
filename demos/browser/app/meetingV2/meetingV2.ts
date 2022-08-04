@@ -2167,7 +2167,7 @@ export class DemoMeetingApp
     //const token = localStorage.getItem('token');
     //console.log(token);
     console.log("begin");
-    const client = new AWS.Chime();
+    const client = new AWS.Amplify();
     AWS.config.update({
       region: "eu-central-1"
     });
@@ -2176,7 +2176,7 @@ export class DemoMeetingApp
     // async/await.
     console.log(client);
     try {
-      const data = await client.listMeetings();
+      const data = await client.listApps();
       console.log(data);
       // process data.
     } catch (error) {
