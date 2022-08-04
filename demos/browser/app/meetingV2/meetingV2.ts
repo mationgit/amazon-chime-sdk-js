@@ -91,6 +91,7 @@ import {
   loadBodyPixDependency,
   platformCanSupportBodyPixWithoutDegradation,
 } from './video/filters/SegmentationUtil';
+import * as AWS from "@aws-sdk/client-amplify";
 
 let SHOULD_EARLY_CONNECT = (() => {
   return document.location.search.includes('earlyConnect=1');
@@ -2165,6 +2166,20 @@ export class DemoMeetingApp
   async joinMeeting(): Promise<any> {
     //const token = localStorage.getItem('token');
     //console.log(token);
+    console.log("begin");
+    const client = new AWS.Amplify({ region: "eu-central-1" });
+
+    // async/await.
+    try {
+      const data = await client.listApps;
+      console.log(data);
+      // process data.
+    } catch (error) {
+      console.log(error);
+      // error handling.
+    }
+    console.log("end");
+
     const response = await fetch(
     //  `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/chime/join`,
     `${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
