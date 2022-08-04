@@ -2167,7 +2167,11 @@ export class DemoMeetingApp
     //const token = localStorage.getItem('token');
     //console.log(token);
     console.log("begin");
-    const client = new AWS.Chime({ region: "eu-central-1" });
+    const client = new AWS.Chime();
+    AWS.config.update({
+      region: "eu-central-1"
+    });
+
 
     // async/await.
     console.log(client);
