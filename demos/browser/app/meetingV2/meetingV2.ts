@@ -91,7 +91,7 @@ import {
   loadBodyPixDependency,
   platformCanSupportBodyPixWithoutDegradation,
 } from './video/filters/SegmentationUtil';
-import * as AWS from "aws-sdk";
+//import * as AWS from "aws-sdk";
 
 let SHOULD_EARLY_CONNECT = (() => {
   return document.location.search.includes('earlyConnect=1');
