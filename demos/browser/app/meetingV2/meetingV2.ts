@@ -1729,6 +1729,7 @@ export class DemoMeetingApp
     await this.chosenVideoTransformDevice?.stop();
     this.chosenVideoTransformDevice = undefined;
     this.roster = {};
+    window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com/home"
   }
 
   setupMuteHandler(): void {
