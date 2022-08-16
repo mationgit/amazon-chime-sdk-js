@@ -222,12 +222,7 @@ interface TranscriptionStreamParams {
 export class DemoMeetingApp
   implements AudioVideoObserver, DeviceChangeObserver, ContentShareObserver, VideoDownlinkObserver {
   static readonly DID: string = '+17035550122';
-  static readonly BASE_URL: string = [
-    location.protocol,
-    '//',
-    location.host,
-    location.pathname.replace(/\/*$/, '/').replace('/v2', ''),
-  ].join('');
+  static readonly BASE_URL: string = 'https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function';
   static testVideo: string =
     'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.360p.vp9.webm';
   static readonly LOGGER_BATCH_SIZE: number = 85;
@@ -2189,7 +2184,7 @@ export class DemoMeetingApp
       // error handling.
     }
     console.log("end");*/
-    const url =`https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function?method=join`+`&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}`
+    const url =`${DemoMeetingApp.BASE_URL}?method=join&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}`
     console.log('join'+url);
 
     const response = await fetch(
@@ -2238,7 +2233,7 @@ export class DemoMeetingApp
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async endMeeting(): Promise<any> {
-    const url =`https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function?method=end`+`&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}`
+    const url =`${DemoMeetingApp.BASE_URL}?method=end&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}`
     console.log('end'+url);
 
     const response = await fetch(//`${DemoMeetingApp.BASE_URL}end?title=${encodeURIComponent(this.meeting)}`, {
