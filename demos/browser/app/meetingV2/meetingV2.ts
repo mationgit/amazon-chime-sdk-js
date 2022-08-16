@@ -429,9 +429,6 @@ export class DemoMeetingApp
   }
 
   initParameters(): void {
-    const env = process.env.AMPLIFY_BACKEND_URL;
-    console.log('ENVIRONMENT')
-    console.log(env)
     const meeting = new URL(window.location.href).searchParams.get('m');
     const attendee = new URL(window.location.href).searchParams.get('a');
     this.token = new URL(window.location.href).searchParams.get('token');
