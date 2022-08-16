@@ -253,6 +253,7 @@ export class DemoMeetingApp
 
   showActiveSpeakerScores = false;
   meeting: string | null = null;
+  token: string | null = null;
   name: string | null = null;
   voiceConnectorId: string | null = null;
   sipURI: string | null = null;
@@ -435,6 +436,7 @@ export class DemoMeetingApp
   initParameters(): void {
     const meeting = new URL(window.location.href).searchParams.get('m');
     const attendee = new URL(window.location.href).searchParams.get('a');
+    this.token = new URL(window.location.href).searchParams.get('token');
     if (meeting) {
       (document.getElementById('inputMeeting') as HTMLInputElement).value = meeting;
       (document.getElementById('inputName') as HTMLInputElement).value = attendee;
@@ -2184,12 +2186,15 @@ export class DemoMeetingApp
       // error handling.
     }
     console.log("end");*/
+    const url =`https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function?method=join`+`&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}`
+    console.log('join'+url);
 
     const response = await fetch(
+    url,
     //  `https://99ir5v5hvb.execute-api.eu-central-1.amazonaws.com/staging/lamapi/chime/join`,
-    `${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
-      this.meeting
-    )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
+    //`${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
+    //  this.meeting
+    //)}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&ns_es=${this.echoReductionCapability}`,
       {
         method: 'GET',
       /*  headers: {
@@ -2230,9 +2235,14 @@ export class DemoMeetingApp
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async endMeeting(): Promise<any> {
-    await fetch(`${DemoMeetingApp.BASE_URL}end?title=${encodeURIComponent(this.meeting)}`, {
-      method: 'POST',
+    const url =`https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function?method=end`+`&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}`
+    console.log('end'+url);
+
+    const response = await fetch(//`${DemoMeetingApp.BASE_URL}end?title=${encodeURIComponent(this.meeting)}`, {
+      url,{
+      method: 'GET',
     });
+    console.log(response)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

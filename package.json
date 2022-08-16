@@ -1,5 +1,5 @@
 {
-  "name": "amazon-chime-sdk-js",
+  "name": "amazon-chime-app",
   "version": "3.0.0-beta.1",
   "description": "Amazon Chime SDK for JavaScript",
   "main": "build/index.js",
@@ -102,11 +102,15 @@
     "@aws-sdk/util-hex-encoding": "^3.47.0",
     "@types/dom-mediacapture-record": "^1.0.7",
     "@types/ua-parser-js": "^0.7.35",
+    "amazon-chime-sdk-js": "^3.6.0",
+    "aws-sdk": "^2.1186.0",
+    "compression": "^1.7.4",
     "detect-browser": "^5.2.0",
+    "grunt-cli": "^1.4.3",
+    "pako": "^2.0.4",
     "protobufjs": "~6.8.8",
     "resize-observer": "^1.0.0",
-    "ua-parser-js": "^1.0.1",
-    "pako": "^2.0.4"
+    "ua-parser-js": "^1.0.1"
   },
   "license": "Apache-2.0",
   "repository": {
