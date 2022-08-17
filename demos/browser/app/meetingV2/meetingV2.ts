@@ -1516,6 +1516,7 @@ export class DemoMeetingApp
       meetingId: configuration.meetingId,
       attendeeId: configuration.credentials.attendeeId,
     });
+    console.log(body)
     try {
       const response = await fetch(`${DemoMeetingApp.BASE_URL}${pathname}`, {
         method: 'GET',
