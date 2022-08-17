@@ -1227,6 +1227,7 @@ export class DemoMeetingApp
         await this.leave();
         (buttonMeetingEnd as HTMLButtonElement).disabled = false;
       });
+      window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com/home"
     });
 
     const buttonMeetingLeave = document.getElementById('button-meeting-leave');
@@ -1239,6 +1240,7 @@ export class DemoMeetingApp
         await this.leave();
         (buttonMeetingLeave as HTMLButtonElement).disabled = false;
       });
+      window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com/home"
     });
   }
 
@@ -1729,7 +1731,6 @@ export class DemoMeetingApp
     await this.chosenVideoTransformDevice?.stop();
     this.chosenVideoTransformDevice = undefined;
     this.roster = {};
-    window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com/home"
   }
 
   setupMuteHandler(): void {
