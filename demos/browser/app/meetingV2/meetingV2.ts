@@ -1518,8 +1518,7 @@ export class DemoMeetingApp
     });
     try {
       const response = await fetch(`${DemoMeetingApp.BASE_URL}${pathname}`, {
-        method: 'POST',
-        body,
+        method: 'GET',
       });
       if (response.status === 200) {
         console.log('[DEMO] log stream created');
@@ -1581,15 +1580,15 @@ export class DemoMeetingApp
       this.meetingLogger = consoleLogger;
     } else {
       await Promise.all([
-        this.createLogStream(configuration, 'create_log_stream'),
-        this.createLogStream(configuration, 'create_browser_event_log_stream'),
+        this.createLogStream(configuration, '/create_log_stream'),
+        this.createLogStream(configuration, '/create_browser_event_log_stream'),
       ]);
       this.meetingSessionPOSTLogger = new MeetingSessionPOSTLogger(
         'SDK',
         configuration,
         DemoMeetingApp.LOGGER_BATCH_SIZE,
         DemoMeetingApp.LOGGER_INTERVAL_MS,
-        `${DemoMeetingApp.BASE_URL}logs`,
+        `${DemoMeetingApp.BASE_URL}/logs`,
         this.logLevel
       );
       this.meetingLogger = new MultiLogger(
@@ -1601,7 +1600,7 @@ export class DemoMeetingApp
         configuration,
         DemoMeetingApp.LOGGER_BATCH_SIZE,
         DemoMeetingApp.LOGGER_INTERVAL_MS,
-        `${DemoMeetingApp.BASE_URL}log_meeting_event`,
+        `${DemoMeetingApp.BASE_URL}/log_meeting_event`,
         this.logLevel
       );
     }
@@ -1693,13 +1692,13 @@ export class DemoMeetingApp
     if (this.isLocalHost()) {
       eventReporter = new DefaultMeetingEventReporter(eventIngestionConfiguration, eventReportingLogger);
     } else {
-      await this.createLogStream(configuration, 'create_browser_event_ingestion_log_stream');
+      await this.createLogStream(configuration, '/create_browser_event_ingestion_log_stream');
       const eventReportingPOSTLogger = new MeetingSessionPOSTLogger(
         'SDKEventIngestion',
         configuration,
         DemoMeetingApp.LOGGER_BATCH_SIZE,
         DemoMeetingApp.LOGGER_INTERVAL_MS,
-        `${DemoMeetingApp.BASE_URL}log_event_ingestion`,
+        `${DemoMeetingApp.BASE_URL}/log_event_ingestion`,
         LogLevel.DEBUG
       );
       const multiEventReportingLogger = new MultiLogger(
@@ -2216,16 +2215,18 @@ export class DemoMeetingApp
   }
 
   async startMediaCapture(): Promise<any> {
+    const url = `${DemoMeetingApp.BASE_URL}?method=startCapture&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}`;
     await fetch(
-      `${DemoMeetingApp.BASE_URL}startCapture?title=${encodeURIComponent(this.meeting)}`, {
-        method: 'POST',
+      url, {
+        method: 'GET',
       });
   }
 
   async stopMediaCapture(): Promise<any> {
+    const url = `${DemoMeetingApp.BASE_URL}?method=endCapture&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}`;
     await fetch(
-      `${DemoMeetingApp.BASE_URL}endCapture?title=${encodeURIComponent(this.meeting)}`, {
-        method: 'POST',
+      url, {
+        method: 'GET',
       });
   }
 
