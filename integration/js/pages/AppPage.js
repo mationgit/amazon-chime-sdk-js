@@ -14,7 +14,6 @@ function findAllElements() {
     attendeeNameInput: By.id('inputName'),
     authenticateButton: By.id('authenticate'),
     localVideoButton: By.id('button-camera'),
-    mediaCaptureButton: By.id('button-record-cloud'),
     addVoiceFocusInput: By.id('add-voice-focus'),        // Checkbox.
     joinButton: By.id('joinButton'),
     meetingEndButtom: By.id('button-meeting-end'),

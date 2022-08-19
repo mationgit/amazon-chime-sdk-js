@@ -52,11 +52,7 @@ import {
   NoOpVideoFrameProcessor,
   RemovableAnalyserNode,
   SimulcastLayers,
-  Transcript,
-  TranscriptEvent,
   TranscriptionStatus,
-  TranscriptionStatusType,
-  TranscriptItemType,
   TranscriptResult,
   Versioning,
   VideoDownlinkObserver,
@@ -192,11 +188,6 @@ const SimulcastLayerMapping = {
   [SimulcastLayers.High]: 'High',
 };
 
-const LANGUAGES_NO_WORD_SEPARATOR = new Set([
-  'ja-JP',
-  'zh-CN',
-]);
-
 interface Toggle {
   name: string;
   oncreate: (elem: HTMLElement) => void;
@@ -208,15 +199,6 @@ interface TranscriptSegment {
   attendee: Attendee;
   startTimeMs: number;
   endTimeMs: number;
-}
-
-interface TranscriptionStreamParams {
-  contentIdentificationType?: 'PII' | 'PHI';
-  contentRedactionType?: 'PII';
-  enablePartialResultsStability?: boolean;
-  partialResultsStability?: string;
-  piiEntityTypes?: string;
-  languageModelName?: string;
 }
 
 export class DemoMeetingApp
@@ -274,11 +256,9 @@ export class DemoMeetingApp
     'button-speaker': true,
     'button-content-share': false,
     'button-pause-content-share': false,
-    'button-live-transcription': false,
     'button-video-stats': false,
     'button-video-filter': false,
     'button-record-self': false,
-    'button-record-cloud': false,
   };
 
   contentShareType: ContentShareType = ContentShareType.ScreenCapture;
@@ -300,8 +280,6 @@ export class DemoMeetingApp
   supportsBackgroundBlur = false;
   supportsBackgroundReplacement = false;
 
-  enableLiveTranscription = false;
-  noWordSeparatorForTranscription = false;
 
   markdown = require('markdown-it')({ linkify: true });
   lastMessageSender: string | null = null;
@@ -324,8 +302,6 @@ export class DemoMeetingApp
   voiceFocusDisplayables: HTMLElement[] = [];
   analyserNode: RemovableAnalyserNode;
 
-  liveTranscriptionDisplayables: HTMLElement[] = [];
-
   chosenVideoTransformDevice: DefaultVideoTransformDevice;
   chosenVideoFilter: VideoFilterName = 'None';
   selectedVideoFilterItem: VideoFilterName = 'None';
@@ -342,7 +318,6 @@ export class DemoMeetingApp
 
   removeFatalHandlers: () => void;
 
-  transcriptContainerDiv = document.getElementById('transcript-container') as HTMLDivElement;
   partialTranscriptDiv: HTMLDivElement | undefined;
   partialTranscriptResultTimeMap = new Map<string, number>();
   partialTranscriptResultMap = new Map<string, TranscriptResult>();
@@ -891,23 +866,6 @@ export class DemoMeetingApp
       }
     });
 
-    const buttonCloudCapture = document.getElementById('button-record-cloud') as HTMLButtonElement;
-    buttonCloudCapture.addEventListener('click', _e => {
-      if (this.toggleButton('button-record-cloud')) {
-        AsyncScheduler.nextTick(async () => {
-          buttonCloudCapture.disabled = true;
-          await this.startMediaCapture();
-          buttonCloudCapture.disabled = false;
-        });
-      } else {
-        AsyncScheduler.nextTick(async () => {
-          buttonCloudCapture.disabled = true;
-          await this.stopMediaCapture();
-          buttonCloudCapture.disabled = false;
-        });
-      }
-    });
-
     const buttonRecordSelf = document.getElementById('button-record-self');
     let recorder: MediaRecorder;
     buttonRecordSelf.addEventListener('click', _e => {
@@ -925,6 +883,7 @@ export class DemoMeetingApp
 
         const localTile = this.audioVideo.getLocalVideoTile();
         if (localTile) {
+          console.log("VideoTracks");
           mixed.addTrack(localTile.state().boundVideoStream.getVideoTracks()[0]);
         }
 
@@ -1034,135 +993,6 @@ export class DemoMeetingApp
         }
       });
     });
-
-    const buttonLiveTranscription = document.getElementById('button-live-transcription');
-    buttonLiveTranscription.addEventListener('click', () => {
-      this.transcriptContainerDiv.style.display = this.isButtonOn('button-live-transcription') ? 'none' : 'block';
-      this.toggleButton('button-live-transcription');
-    });
-
-    const buttonLiveTranscriptionModal = document.getElementById('button-live-transcription-modal-close');
-    buttonLiveTranscriptionModal.addEventListener('click', () => {
-      document.getElementById('live-transcription-modal').style.display = 'none';
-    });
-
-    // show only languages available to selected transcription engine
-    document.getElementsByName('transcription-engine').forEach(e => {
-      e.addEventListener('change', () => {
-        const engineTranscribeChecked = (document.getElementById('engine-transcribe') as HTMLInputElement).checked;
-        const contentIdentificationChecked = (document.getElementById('content-identification-checkbox') as HTMLInputElement).checked;
-        const contentRedactionChecked = (document.getElementById('content-redaction-checkbox') as HTMLInputElement).checked;
-        document.getElementById('engine-transcribe-language').classList.toggle('hidden', !engineTranscribeChecked);
-		    document.getElementById('engine-transcribe-medical-language').classList.toggle('hidden', engineTranscribeChecked);
-        document.getElementById('engine-transcribe-region').classList.toggle('hidden', !engineTranscribeChecked);
-        document.getElementById('engine-transcribe-medical-region').classList.toggle('hidden', engineTranscribeChecked);
-        document.getElementById('engine-transcribe-medical-content-identification').classList.toggle('hidden', engineTranscribeChecked);
-        document.getElementById('engine-transcribe-content-identification').classList.toggle('hidden', !engineTranscribeChecked);
-        document.getElementById('engine-transcribe-redaction').classList.toggle('hidden', !engineTranscribeChecked);
-        document.getElementById('engine-transcribe-partial-stabilization').classList.toggle('hidden', !engineTranscribeChecked);
-        document.getElementById('engine-transcribe-custom-language-model').classList.toggle('hidden', !engineTranscribeChecked);
-        if (!engineTranscribeChecked) {
-          document.getElementById('transcribe-entity-types').classList.toggle('hidden', true);
-        } else if (engineTranscribeChecked && (contentIdentificationChecked || contentRedactionChecked)) {
-          document.getElementById('transcribe-entity-types').classList.toggle('hidden', false);
-        }
-      });
-    });
-
-    const contentIdentificationCb = document.getElementById('content-identification-checkbox') as HTMLInputElement;
-    contentIdentificationCb.addEventListener('click', () => {
-      (document.getElementById('content-redaction-checkbox') as HTMLInputElement).disabled = contentIdentificationCb.checked;
-      (document.getElementById('transcribe-entity-types') as HTMLInputElement).classList.toggle('hidden', !contentIdentificationCb.checked);
-    });
-
-    const contentRedactionCb = document.getElementById('content-redaction-checkbox') as HTMLInputElement;
-    contentRedactionCb.addEventListener('click', () => {
-      (document.getElementById('content-identification-checkbox') as HTMLInputElement).disabled = contentRedactionCb.checked;
-      (document.getElementById('transcribe-entity-types') as HTMLInputElement).classList.toggle('hidden', !contentRedactionCb.checked);
-    });
-
-    const partialResultsStabilityCb = document.getElementById('partial-stabilization-checkbox') as HTMLInputElement;
-    partialResultsStabilityCb.addEventListener('click', () => {
-      (document.getElementById('transcribe-partial-stability').classList.toggle('hidden', !partialResultsStabilityCb.checked));
-    });
-
-    const languageModelCb = document.getElementById('custom-language-model-checkbox') as HTMLInputElement;
-    languageModelCb.addEventListener('click', () => {
-      (document.getElementById('language-model').classList.toggle('hidden', !languageModelCb.checked));
-    });
-
-    const buttonStartTranscription = document.getElementById('button-start-transcription');
-    buttonStartTranscription.addEventListener('click', async () => {
-      let engine = '';
-      let languageCode = '';
-      let region = '';
-      const transcriptionStreamParams: TranscriptionStreamParams = {};
-      if ((document.getElementById('engine-transcribe') as HTMLInputElement).checked) {
-        engine = 'transcribe';
-        languageCode = (document.getElementById('transcribe-language') as HTMLInputElement).value;
-        region = (document.getElementById('transcribe-region') as HTMLInputElement).value;
-
-        if (isChecked('content-identification-checkbox')) {
-          transcriptionStreamParams.contentIdentificationType = 'PII';
-        }
-
-        if (isChecked('content-redaction-checkbox')) {
-          transcriptionStreamParams.contentRedactionType = 'PII';
-        }
-
-        if (isChecked('partial-stabilization-checkbox')) {
-          transcriptionStreamParams.enablePartialResultsStability = true;
-        }
-
-        let partialResultsStability = (document.getElementById('partial-stability') as HTMLInputElement).value;
-        if (partialResultsStability) {
-          transcriptionStreamParams.partialResultsStability = partialResultsStability;
-        }
-        if (isChecked('content-identification-checkbox') || isChecked('content-redaction-checkbox')) {
-          const selected = document.querySelectorAll('#transcribe-entity option:checked');
-          let values = '';
-          if (selected.length > 0) {
-            values = Array.from(selected).filter(node => (node as HTMLInputElement).value !== '').map(el => (el as HTMLInputElement).value).join(',');
-          }
-          if (values !== '') {
-            transcriptionStreamParams.piiEntityTypes = values;
-          }
-        }
-
-        if (isChecked('custom-language-model-checkbox')) {
-          let languageModelName = (document.getElementById('language-model-input-text') as HTMLInputElement).value;
-          if (languageModelName) {
-            transcriptionStreamParams.languageModelName = languageModelName;
-          }
-        }
-      } else if ((document.getElementById('engine-transcribe-medical') as HTMLInputElement).checked) {
-        engine = 'transcribe_medical';
-        languageCode = (document.getElementById('transcribe-medical-language') as HTMLInputElement).value;
-        region = (document.getElementById('transcribe-medical-region') as HTMLInputElement).value;
-        if (isChecked('medical-content-identification-checkbox')) {
-          transcriptionStreamParams.contentIdentificationType = 'PHI';
-        }
-      } else {
-        throw new Error('Unknown transcription engine');
-      }
-      await startLiveTranscription(engine, languageCode, region, transcriptionStreamParams);
-    });
-
-    function isChecked(id: string): boolean {
-      return (document.getElementById(id) as HTMLInputElement).checked;
-    }
-
-    const startLiveTranscription = async (engine: string, languageCode: string, region: string, transcriptionStreamParams: TranscriptionStreamParams) => {
-      const transcriptionAdditionalParams = JSON.stringify(transcriptionStreamParams);
-      const response = await fetch(`${DemoMeetingApp.BASE_URL}start_transcription?title=${encodeURIComponent(this.meeting)}&engine=${encodeURIComponent(engine)}&language=${encodeURIComponent(languageCode)}&region=${encodeURIComponent(region)}&transcriptionStreamParams=${encodeURIComponent(transcriptionAdditionalParams)}`, {
-        method: 'POST',
-      });
-      const json = await response.json();
-      if (json.error) {
-        throw new Error(`Server error: ${json.error}`);
-      }
-      document.getElementById('live-transcription-modal').style.display = 'none';
-    };
 
     const buttonVideoStats = document.getElementById('button-video-stats');
     buttonVideoStats.addEventListener('click', () => {
@@ -1657,7 +1487,6 @@ export class DemoMeetingApp
     this.setupCanUnmuteHandler();
     this.setupSubscribeToAttendeeIdPresenceHandler();
     this.setupDataMessage();
-    this.setupLiveTranscription();
     this.audioVideo.addObserver(this);
     this.meetingSession.eventController.addObserver(this);
     this.audioVideo.addContentShareObserver(this);
@@ -1940,189 +1769,6 @@ export class DemoMeetingApp
     );
   }
 
-  transcriptEventHandler = (transcriptEvent: TranscriptEvent): void => {
-    if (!this.enableLiveTranscription) {
-      // Toggle disabled 'Live Transcription' button to enabled when we receive any transcript event
-      this.enableLiveTranscription = true;
-      this.updateLiveTranscriptionDisplayState();
-
-      // Transcripts view and the button to show and hide it are initially hidden
-      // Show them when when live transcription gets enabled, and do not hide afterwards
-      this.setButtonVisibility('button-live-transcription', true, 'on');
-      this.transcriptContainerDiv.style.display = 'block';
-    }
-
-    if (transcriptEvent instanceof TranscriptionStatus) {
-      this.appendStatusDiv(transcriptEvent);
-      if (transcriptEvent.type === TranscriptionStatusType.STARTED) {
-        // Determine word separator based on language code
-        let languageCode = null;
-        const transcriptionConfiguration = JSON.parse(transcriptEvent.transcriptionConfiguration);
-        if (transcriptionConfiguration) {
-          if (transcriptionConfiguration.EngineTranscribeSettings) {
-            languageCode = transcriptionConfiguration.EngineTranscribeSettings.LanguageCode;
-          } else if (transcriptionConfiguration.EngineTranscribeMedicalSettings) {
-            languageCode = transcriptionConfiguration.EngineTranscribeMedicalSettings.languageCode;
-          }
-        }
-
-        if (languageCode && LANGUAGES_NO_WORD_SEPARATOR.has(languageCode)) {
-          this.noWordSeparatorForTranscription = true;
-        }
-      } else if ((transcriptEvent.type === TranscriptionStatusType.STOPPED || transcriptEvent.type === TranscriptionStatusType.FAILED) && this.enableLiveTranscription) {
-        // When we receive a STOPPED status event:
-        // 1. toggle enabled 'Live Transcription' button to disabled
-        this.enableLiveTranscription = false;
-        this.noWordSeparatorForTranscription = false;
-        this.updateLiveTranscriptionDisplayState();
-
-        // 2. force finalize all partial results
-        this.partialTranscriptResultTimeMap.clear();
-        this.partialTranscriptDiv = null;
-        this.partialTranscriptResultMap.clear();
-      }
-    } else if (transcriptEvent instanceof Transcript) {
-      for (const result of transcriptEvent.results) {
-        const resultId = result.resultId;
-        const isPartial = result.isPartial;
-        if (!isPartial) {
-          if (result.alternatives[0].entities?.length > 0) {
-            for (const entity of result.alternatives[0].entities) {
-              //split the entity based on space
-              let contentArray = entity.content.split(' ');
-              for (const content of contentArray) {
-                this.transcriptEntitySet.add(content);
-              }
-            }
-          }
-        }
-        this.partialTranscriptResultMap.set(resultId, result);
-        this.partialTranscriptResultTimeMap.set(resultId, result.endTimeMs);
-        this.renderPartialTranscriptResults();
-        if (isPartial) {
-          continue;
-        }
-
-        // Force finalizing partial results that's 5 seconds older than the latest one,
-        // to prevent local partial results from indefinitely growing
-        for (const [olderResultId, endTimeMs] of this.partialTranscriptResultTimeMap) {
-          if (olderResultId === resultId) {
-            break;
-          } else if (endTimeMs < result.endTimeMs - 5000) {
-            this.partialTranscriptResultTimeMap.delete(olderResultId);
-          }
-        }
-
-        this.partialTranscriptResultTimeMap.delete(resultId);
-        this.transcriptEntitySet.clear();
-
-        if (this.partialTranscriptResultTimeMap.size === 0) {
-          // No more partial results in current batch, reset current batch
-          this.partialTranscriptDiv = null;
-          this.partialTranscriptResultMap.clear();
-        }
-      }
-    }
-
-    this.transcriptContainerDiv.scrollTop = this.transcriptContainerDiv.scrollHeight;
-  };
-
-  renderPartialTranscriptResults = () => {
-    if (this.partialTranscriptDiv) {
-      // Keep updating existing partial result div
-      this.updatePartialTranscriptDiv();
-    } else {
-      // All previous results were finalized. Create a new div for new results, update, then add it to DOM
-      this.partialTranscriptDiv = document.createElement('div') as HTMLDivElement;
-      this.updatePartialTranscriptDiv();
-      this.transcriptContainerDiv.appendChild(this.partialTranscriptDiv);
-    }
-  };
-
-  updatePartialTranscriptDiv = () => {
-    this.partialTranscriptDiv.innerHTML = '';
-
-    const partialTranscriptSegments: TranscriptSegment[] = [];
-    for (const result of this.partialTranscriptResultMap.values()) {
-      this.populatePartialTranscriptSegmentsFromResult(partialTranscriptSegments, result);
-    }
-    partialTranscriptSegments.sort((a, b) => a.startTimeMs - b.startTimeMs);
-
-    const speakerToTranscriptSpanMap = new Map<string, HTMLSpanElement>();
-    for (const segment of partialTranscriptSegments) {
-      const newSpeakerId = segment.attendee.attendeeId;
-      if (!speakerToTranscriptSpanMap.has(newSpeakerId)) {
-        this.appendNewSpeakerTranscriptDiv(segment, speakerToTranscriptSpanMap);
-      } else {
-        const partialResultSpeakers: string[] = Array.from(speakerToTranscriptSpanMap.keys());
-        if (partialResultSpeakers.indexOf(newSpeakerId) < partialResultSpeakers.length - 1) {
-          // Not the latest speaker and we reach the end of a sentence, clear the speaker to Span mapping to break line
-          speakerToTranscriptSpanMap.delete(newSpeakerId);
-          this.appendNewSpeakerTranscriptDiv(segment, speakerToTranscriptSpanMap);
-        } else {
-          const transcriptSpan = speakerToTranscriptSpanMap.get(newSpeakerId);
-          transcriptSpan.appendChild(this.createSpaceSpan());
-          transcriptSpan.appendChild(segment.contentSpan);
-        }
-      }
-    }
-  };
-
-  populatePartialTranscriptSegmentsFromResult = (segments: TranscriptSegment[], result: TranscriptResult) => {
-    let startTimeMs: number = null;
-    let attendee: Attendee = null;
-    let contentSpan;
-    for (const item of result.alternatives[0].items) {
-      const itemContentSpan = document.createElement('span') as HTMLSpanElement;
-      itemContentSpan.innerText = item.content;
-      itemContentSpan.classList.add('transcript-content');
-      // underline the word with red to show confidence level of predicted word being less than 0.3
-      // for redaction, words are represented as '[Name]' and has a confidence of 0. Redacted words are only shown with highlighting.
-      if (item.hasOwnProperty('confidence') && !item.content.startsWith("[") && item.confidence < 0.3) {
-        itemContentSpan.classList.add('confidence-style');
-      }
-
-      // highlight the word in green to show the predicted word is a PII/PHI entity
-      if (this.transcriptEntitySet.size > 0 && this.transcriptEntitySet.has(item.content)) {
-        itemContentSpan.classList.add('entity-color');
-      }
-
-      if (!startTimeMs) {
-        contentSpan = document.createElement('span') as HTMLSpanElement;
-        contentSpan.appendChild(itemContentSpan);
-        attendee = item.attendee;
-        startTimeMs = item.startTimeMs;
-      } else if (item.type === TranscriptItemType.PUNCTUATION) {
-        contentSpan.appendChild(itemContentSpan);
-        segments.push({
-          contentSpan,
-          attendee: attendee,
-          startTimeMs: startTimeMs,
-          endTimeMs: item.endTimeMs
-        });
-        startTimeMs = null;
-        attendee = null;
-      } else {
-        if (this.noWordSeparatorForTranscription) {
-          contentSpan.appendChild(itemContentSpan);
-        } else {
-          contentSpan.appendChild(this.createSpaceSpan());
-          contentSpan.appendChild(itemContentSpan);
-        }
-      }
-    }
-
-    // Reached end of the result but there is no closing punctuation
-    if (startTimeMs) {
-      segments.push({
-        contentSpan: contentSpan,
-        attendee: attendee,
-        startTimeMs: startTimeMs,
-        endTimeMs: result.endTimeMs,
-      });
-    }
-  };
-
   createSpaceSpan(): HTMLSpanElement {
     const spaceSpan = document.createElement('span') as HTMLSpanElement;
     spaceSpan.classList.add('transcript-content');
@@ -2154,11 +1800,6 @@ export class DemoMeetingApp
     statusDiv.innerText = '(Live Transcription ' + status.type + ' at '
       + new Date(status.eventTimeMs).toLocaleTimeString() + ' in ' + status.transcriptionRegion
       + ' with configuration: ' + status.transcriptionConfiguration + ')';
-    this.transcriptContainerDiv.appendChild(statusDiv);
-  };
-
-  setupLiveTranscription = () => {
-    this.audioVideo.transcriptionController?.subscribeToTranscriptEvent(this.transcriptEventHandler);
   };
 
   // eslint-disable-next-line
@@ -2518,14 +2159,6 @@ export class DemoMeetingApp
       });
     }
 
-    additionalToggles.push({
-      name: 'Live Transcription',
-      oncreate: (elem: HTMLElement) => {
-        this.liveTranscriptionDisplayables.push(elem);
-      },
-      action: () => this.toggleLiveTranscription(),
-    });
-
     this.populateDeviceList(
       'audio-input',
       genericName,
@@ -2598,30 +2231,6 @@ export class DemoMeetingApp
     this.log('Amazon Voice Focus toggle is now', elem.checked);
 
     await this.reselectAudioInputDevice();
-  }
-
-  private updateLiveTranscriptionDisplayState() {
-    this.log('Updating live transcription display state to:', this.enableLiveTranscription);
-    for (const elem of this.liveTranscriptionDisplayables) {
-      elem.classList.toggle('live-transcription-active', this.enableLiveTranscription);
-    }
-  }
-
-  private async toggleLiveTranscription(): Promise<void> {
-    this.log('live transcription were previously set to ' + this.enableLiveTranscription + '; attempting to toggle');
-
-    if (this.enableLiveTranscription) {
-      const response = await fetch(`${DemoMeetingApp.BASE_URL}${encodeURIComponent('stop_transcription')}?title=${encodeURIComponent(this.meeting)}`, {
-        method: 'POST',
-      });
-      const json = await response.json();
-      if (json.error) {
-        throw new Error(`Server error: ${json.error}`);
-      }
-    } else {
-      const liveTranscriptionModal = document.getElementById(`live-transcription-modal`);
-      liveTranscriptionModal.style.display = "block";
-    }
   }
 
   async populateVideoInputList(): Promise<void> {
@@ -3373,9 +2982,6 @@ export class DemoMeetingApp
       // Stop listening to attendee presence.
       this.audioVideo.realtimeUnsubscribeToAttendeeIdPresence(this.attendeeIdPresenceHandler);
 
-      // Stop listening to transcript events.
-      this.audioVideo.transcriptionController?.unsubscribeFromTranscriptEvent(this.transcriptEventHandler);
-
       // Stop watching device changes in the UI.
       this.audioVideo.removeDeviceChangeObserver(this);
 
@@ -3513,11 +3119,4 @@ export class DemoMeetingApp
 
 window.addEventListener('load', () => {
   new DemoMeetingApp();
-});
-
-window.addEventListener('click', event => {
-  const liveTranscriptionModal = document.getElementById('live-transcription-modal');
-  if (event.target === liveTranscriptionModal) {
-    liveTranscriptionModal.style.display = 'none';
-  }
 });

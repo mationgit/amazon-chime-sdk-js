@@ -458,10 +458,6 @@ svg {
     height: auto !important;
   }
 
-  #tile-transcript-container {
-    height: auto !important;
-  }
-
   .bs-component {
     max-height: 210px;
     height: auto !important;
@@ -932,15 +928,6 @@ a.markdown:active {
   content: "✓ "
 }
 
-.transcript-container {
-  max-height: 210px;
-  border-radius: 10px;
-  background-color: #bbb;
-  overflow-y: scroll;
-  margin-top: 10px;
-  padding: 0.2rem 1rem;
-}
-
 .transcript {
   white-space: nowrap;
   word-wrap: break-word;
@@ -1013,8 +1000,4 @@ a.markdown:active {
 .entity-color {
   color: green;
   font-weight: bold;
-}
-
-#live-transcription-modal-content > * {
-  margin: 8px 0;
 }
