@@ -54,7 +54,6 @@ import {
   SimulcastLayers,
   TranscriptionStatus,
   TranscriptResult,
-  Versioning,
   VideoDownlinkObserver,
   VideoFrameProcessor,
   VideoInputDevice,
@@ -292,6 +291,7 @@ export class DemoMeetingApp
   voiceFocusTransformer: VoiceFocusDeviceTransformer | undefined;
   voiceFocusDevice: VoiceFocusTransformDevice | undefined;
   joinInfo: any | undefined;
+  meetingName: String;
 
   blurProcessor: BackgroundBlurProcessor | undefined;
   replacementProcessor: BackgroundReplacementProcessor | undefined;
@@ -360,8 +360,6 @@ export class DemoMeetingApp
       return;
     }
 
-    (document.getElementById('sdk-version') as HTMLSpanElement).innerText =
-      'amazon-chime-sdk-js@' + Versioning.sdkVersion;
     this.initEventListeners();
     this.initParameters();
     this.setMediaRegion();
@@ -608,7 +606,7 @@ export class DemoMeetingApp
           }
           (document.getElementById(
             'meeting-id'
-          ) as HTMLSpanElement).innerText = `${this.meeting} (${this.region})`;
+          ) as HTMLSpanElement).innerText = `${this.meetingName}`;
           (document.getElementById(
             'chime-meeting-id'
           ) as HTMLSpanElement).innerText = `Meeting ID: ${chimeMeetingId}`;
@@ -1825,7 +1823,6 @@ export class DemoMeetingApp
     }
     console.log("end");*/
     const url =`${DemoMeetingApp.BASE_URL}?method=join&token=${encodeURIComponent(this.token)}&id=${encodeURIComponent(this.meeting)}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}`
-    console.log('join'+url);
 
     const response = await fetch(
     url,
@@ -2909,7 +2906,9 @@ export class DemoMeetingApp
 
   async authenticate(): Promise<string> {
     console.log("joininfo");
-    this.joinInfo = (await this.joinMeeting()).JoinInfo;
+    var joinMeetingvar = await this.joinMeeting();
+    this.meetingName = joinMeetingvar.MeetingName;
+    this.joinInfo = joinMeetingvar.JoinInfo;
     console.log("conf");
     const configuration = new MeetingSessionConfiguration(this.joinInfo.Meeting, this.joinInfo.Attendee);
     console.log("init");
