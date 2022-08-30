@@ -8,7 +8,7 @@ export class DemoVideoTile extends HTMLElement {
   <div class="video-tile-nameplate"></div>
   <div class="video-tile-pause-state"></div>
   <div class="button-video-tile-config" role="group">
-    <button type="button" class="btn btn-success dropdown-toggle button-video-tile-config-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Video Tile Settings"><%= require('../../../node_modules/open-iconic/svg/cog.svg') %></button>
+    <button type="button" class="btn btn-primary dropdown-toggle button-video-tile-config-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Video Tile Settings"><%= require('../../../node_modules/open-iconic/svg/cog.svg') %></button>
     <div class="dropdown-menu dropdown-menu-right dropdown-video-tile-config" aria-labelledby="button-video-tile-config-drop" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
       <a class="dropdown-item video-tile-pause">Pause</a>
       <div class="dropdown-divider"></div>

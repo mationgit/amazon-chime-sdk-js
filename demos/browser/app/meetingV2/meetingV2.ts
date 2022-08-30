@@ -1186,15 +1186,15 @@ export class DemoMeetingApp
       const element = document.getElementById(button);
       const drop = document.getElementById(`${button}-drop`);
       const on = this.buttonStates[button];
-      element.classList.add(on ? 'btn-success' : 'btn-outline-secondary');
-      element.classList.remove(on ? 'btn-outline-secondary' : 'btn-success');
+      element.classList.add(on ? 'btn-primary' : 'btn-outline-secondary');
+      element.classList.remove(on ? 'btn-outline-secondary' : 'btn-primary');
       (element.firstElementChild as SVGElement).classList.add(on ? 'svg-active' : 'svg-inactive');
       (element.firstElementChild as SVGElement).classList.remove(
         on ? 'svg-inactive' : 'svg-active'
       );
       if (drop) {
-        drop.classList.add(on ? 'btn-success' : 'btn-outline-secondary');
-        drop.classList.remove(on ? 'btn-outline-secondary' : 'btn-success');
+        drop.classList.add(on ? 'btn-primary' : 'btn-outline-secondary');
+        drop.classList.remove(on ? 'btn-outline-secondary' : 'btn-primary');
       }
     }
   }
