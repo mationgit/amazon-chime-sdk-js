@@ -375,6 +375,7 @@ export class DemoMeetingApp
       });
     } else {
       this.switchToFlow('flow-authenticate');
+      console.log("home");      
     }
   }
 
@@ -2942,10 +2943,8 @@ export class DemoMeetingApp
     const returnToStart = () => {
       switch (this.behaviorAfterLeave) {
         case 'spa':
-          this.switchToFlow('flow-authenticate');
-          break;
         case 'reload':
-          window.location.href = window.location.pathname;
+          window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com";
           break;
         // This is useful for testing memory leaks.
         case 'halt': {
