@@ -86,6 +86,7 @@ import {
   loadBodyPixDependency,
   platformCanSupportBodyPixWithoutDegradation,
 } from './video/filters/SegmentationUtil';
+import { OS } from 'ua-parser-js';
 //import * as AWS from "aws-sdk";
 
 let SHOULD_EARLY_CONNECT = (() => {
@@ -204,6 +205,7 @@ export class DemoMeetingApp
   implements AudioVideoObserver, DeviceChangeObserver, ContentShareObserver, VideoDownlinkObserver {
   static readonly DID: string = '+17035550122';
   static readonly BASE_URL: string = 'https://klpnrsf1td.execute-api.eu-central-1.amazonaws.com/default/lamameet-chime-function';
+  static readonly LAMAMEET_URL: string = "https://main.d2zfub7if0s6yi.amplifyapp.com";
   static testVideo: string =
     'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.360p.vp9.webm';
   static readonly LOGGER_BATCH_SIZE: number = 85;
@@ -1056,7 +1058,7 @@ export class DemoMeetingApp
         await this.leave();
         (buttonMeetingEnd as HTMLButtonElement).disabled = false;
       });
-      window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com";
+      window.location.href = DemoMeetingApp.LAMAMEET_URL;
     });
 
     const buttonMeetingLeave = document.getElementById('button-meeting-leave');
@@ -1067,7 +1069,7 @@ export class DemoMeetingApp
         await this.leave();
         (buttonMeetingLeave as HTMLButtonElement).disabled = false;
       });
-      window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com";
+      window.location.href = DemoMeetingApp.LAMAMEET_URL;
     });
   }
 
@@ -2944,7 +2946,7 @@ export class DemoMeetingApp
       switch (this.behaviorAfterLeave) {
         case 'spa':
         case 'reload':
-          window.location.href = "https://main.d2zfub7if0s6yi.amplifyapp.com";
+          window.location.href = DemoMeetingApp.LAMAMEET_URL;
           break;
         // This is useful for testing memory leaks.
         case 'halt': {
